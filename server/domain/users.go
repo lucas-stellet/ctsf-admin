@@ -11,9 +11,10 @@ import (
 
 type User struct {
 	Base     `valid:"required"`
-	Name     string `json:"name" valid:"notnull"`
-	Email    string `json:"email" valid:"notnull, email"`
-	Password string `json:"password" valid:"notnull"`
+	Name     string `json:"name" gorm:"type:varchar(255)" valid:"notnull"`
+	Email    string `json:"email" gorm:"type:varchar(255);unique_index" valid:"notnull, email"`
+	Password string `json:"password" gorm:"type:varchar(255)" valid:"notnull"`
+	Token    string `json:"token" gorm:"type:varchar(255);unique_index" valid:"notnull,uuid"`
 }
 
 func (u *User) isValid() error {
@@ -26,7 +27,7 @@ func (u *User) isValid() error {
 	return nil
 }
 
-func (user *User) Prepare() error {
+func (user *User) prepare() error {
 	password, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 
 	if err != nil {
@@ -58,7 +59,7 @@ func NewUser(name, email, password string) (*User, error) {
 		Password: password,
 	}
 
-	err := user.isValid()
+	err := user.prepare()
 
 	if err != nil {
 		return nil, err
