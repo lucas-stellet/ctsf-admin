@@ -1,19 +1,18 @@
 package domain
 
 import (
-	"time"
-
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 
 	"github.com/asaskevich/govalidator"
 	uuid "github.com/satori/go.uuid"
 )
 
 type User struct {
-	Base     `valid:"required"`
-	Name     string `json:"name" gorm:"type:varchar(255)" valid:"notnull"`
-	Email    string `json:"email" gorm:"type:varchar(255);unique_index" valid:"notnull, email"`
-	Password string `json:"password" gorm:"type:varchar(255)" valid:"notnull"`
+	gorm.Model
+	Name     string `json:"name" valid:"notnull" `
+	Email    string `json:"email" gorm:"type:varchar(255);unique_index" valid:"notnull,email"`
+	Password string `json:"-" gorm:"type:varchar(255)" valid:"notnull"`
 	Token    string `json:"token" gorm:"type:varchar(255);unique_index" valid:"notnull,uuid"`
 }
 
@@ -27,18 +26,17 @@ func (u *User) isValid() error {
 	return nil
 }
 
-func (user *User) prepare() error {
-	password, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+func (u *User) prepare() error {
+	password, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 
 	if err != nil {
 		return err
 	}
 
-	user.ID = uuid.NewV4().String()
-	user.CreatedAt = time.Now()
-	user.Password = string(password)
+	u.Password = string(password)
+	u.Token = uuid.NewV4().String()
 
-	err = user.isValid()
+	err = u.isValid()
 
 	if err != nil {
 		return err
@@ -47,8 +45,8 @@ func (user *User) prepare() error {
 	return nil
 }
 
-func (user *User) IsCorrectPassword(password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+func (u *User) IsCorrectPassword(password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 	return err == nil
 }
 
