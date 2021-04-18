@@ -8,7 +8,6 @@ import (
 )
 
 type Transaction struct {
-	Base   `valid:"required"`
 	Type   string  `json:"name" valid:"notnull"`
 	Amount float64 `json:"Amount" valid:"notnull"`
 }

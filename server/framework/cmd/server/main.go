@@ -1,14 +1,15 @@
 package main
 
 import (
+	"log"
+	"path"
+	"runtime"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/lucas-stellet/ctsf-admin/server/application/routes"
 	"github.com/lucas-stellet/ctsf-admin/server/framework/utils"
-	"log"
-	"path"
-	"runtime"
 
 	"os"
 )

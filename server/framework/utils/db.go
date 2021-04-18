@@ -23,7 +23,7 @@ func init() {
 	}
 }
 
-func Connection(env string) *gorm.DB {
+func ConnectDB(env string) *gorm.DB {
 	var dsn string
 	var db *gorm.DB
 	var err error
